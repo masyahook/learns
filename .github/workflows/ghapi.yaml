@@ -6,6 +6,16 @@ permissions:
   pull-requests: write
 
 jobs:
+  pr_commented:
+    # This job only runs for pull request comments
+    name: PR comment
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo A comment on PR $NUMBER
+        env:
+          NUMBER: ${{ github.event.issue.number }}
   ghapi-exercise:
     if: (github.event.issue.pull_request != null) && startsWith(github.event.comment.body, '/')
     runs-on: ubuntu-latest
