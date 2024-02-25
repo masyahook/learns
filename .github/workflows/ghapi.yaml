@@ -8,6 +8,10 @@ permissions:
 jobs:
   pr_commented:
     runs-on: ubuntu-latest
+    env:
+      NUMBER: ${{ github.event.issue.number }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
     if: ${{ github.event.issue.pull_request }}
     steps:
     - name: Get PR branch
@@ -42,10 +46,6 @@ jobs:
     - name: PR comment
       run: |
         echo A comment on PR $NUMBER
-      env:
-        NUMBER: ${{ github.event.issue.number }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        REPO: ${{ github.repository }}
   # ghapi-exercise:
   #   if: (github.event.issue.pull_request != null) && startsWith(github.event.comment.body, '/')
   #   runs-on: ubuntu-latest
