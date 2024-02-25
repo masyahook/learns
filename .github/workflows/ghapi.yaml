@@ -1,0 +1,75 @@
+name: excercise-ghapi
+on: issue_comment
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  pr_commented:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.issue.pull_request }}
+    steps:
+    - name: Get PR branch
+      uses: xt0rted/pull-request-comment-branch@v1
+      id: comment-branch
+
+    - name: Set latest commit status as pending
+      uses: myrotvorets/set-commit-status-action@master
+      with:
+        sha: ${{ steps.comment-branch.outputs.head_sha }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: pending
+
+    - name: Checkout PR branch
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ steps.comment-branch.outputs.head_ref }}
+
+    - name: Setup Node.js 16
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Deploy
+      run: |
+        echo "Deploying..."
+
+    - name: Set latest commit status as ${{ job.status }}
+      uses: myrotvorets/set-commit-status-action@master
+      if: always()
+      with:
+        sha: ${{ steps.comment-branch.outputs.head_sha }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: ${{ job.status }}
+    - name: PR comment
+      run: |
+        echo A comment on PR $NUMBER
+      env:
+        NUMBER: ${{ github.event.issue.number }}
+  # ghapi-exercise:
+  #   if: (github.event.issue.pull_request != null) && startsWith(github.event.comment.body, '/')
+  #   runs-on: ubuntu-latest
+  #   steps:        
+  #   - name: install dependencies
+  #     run: pip install ghapi 
+
+  #   - name: see payload # this step is for debugging purposes only, so you can see the payload. 
+  #     run: echo "PAYLOAD:\n${PAYLOAD}\n"
+  #     env:
+  #       PAYLOAD: ${{ toJSON(github.event) }}       
+      
+  #   - name: Make a comment
+  #     shell: python
+  #     run: |
+  #       import os
+  #       from ghapi.core import GhApi
+  #       owner, repo = os.environ['REPO'].split('/')
+  #       api = GhApi(owner=owner, repo=repo)
+  #       label = os.environ['COMMENT'].strip('/')
+  #       api.issues.add_labels(issue_number=os.environ['NUMBER'], labels=[label])
+  #     env:
+  #       NUMBER: ${{ github.event.issue.number }} 
+  #       COMMENT: ${{ github.event.comment.body }} 
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       REPO: ${{ github.repository }}
