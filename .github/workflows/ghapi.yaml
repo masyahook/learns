@@ -44,6 +44,8 @@ jobs:
         echo A comment on PR $NUMBER
       env:
         NUMBER: ${{ github.event.issue.number }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
   # ghapi-exercise:
   #   if: (github.event.issue.pull_request != null) && startsWith(github.event.comment.body, '/')
   #   runs-on: ubuntu-latest
