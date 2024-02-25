@@ -7,8 +7,9 @@ jobs:
     env:
       NUMBER: ${{ github.event.issue.number }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      COMMENT: ${{ github.event.comment.body }} 
       REPO: ${{ github.repository }}
-    if: ${{ github.event.issue.pull_request }}
+    if: (github.event.issue.pull_request != null) && startsWith(github.event.comment.body, '/')
     steps:
     - name: Get PR branch
       uses: xt0rted/pull-request-comment-branch@v1
@@ -42,29 +43,22 @@ jobs:
     - name: PR comment
       run: |
         echo A comment on PR $NUMBER
-  # ghapi-exercise:
-  #   if: (github.event.issue.pull_request != null) && startsWith(github.event.comment.body, '/')
-  #   runs-on: ubuntu-latest
-  #   steps:        
-  #   - name: install dependencies
-  #     run: pip install ghapi 
+  
+    - name: install dependencies
+      run: pip install ghapi 
 
-  #   - name: see payload # this step is for debugging purposes only, so you can see the payload. 
-  #     run: echo "PAYLOAD:\n${PAYLOAD}\n"
-  #     env:
-  #       PAYLOAD: ${{ toJSON(github.event) }}       
+    - name: see payload # this step is for debugging purposes only, so you can see the payload. 
+      run: echo "PAYLOAD:\n${PAYLOAD}\n"
+      env:
+        PAYLOAD: ${{ toJSON(github.event) }}       
       
-  #   - name: Make a comment
-  #     shell: python
-  #     run: |
-  #       import os
-  #       from ghapi.core import GhApi
-  #       owner, repo = os.environ['REPO'].split('/')
-  #       api = GhApi(owner=owner, repo=repo)
-  #       label = os.environ['COMMENT'].strip('/')
-  #       api.issues.add_labels(issue_number=os.environ['NUMBER'], labels=[label])
-  #     env:
-  #       NUMBER: ${{ github.event.issue.number }} 
-  #       COMMENT: ${{ github.event.comment.body }} 
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       REPO: ${{ github.repository }}
+    - name: Make a comment
+      shell: python
+      run: |
+        import os
+        from ghapi.core import GhApi
+        owner, repo = os.environ['REPO'].split('/')
+        api = GhApi(owner=owner, repo=repo)
+        label = os.environ['COMMENT'].strip('/')
+        api.issues.add_labels(issue_number=os.environ['NUMBER'], labels=[label])
+        
