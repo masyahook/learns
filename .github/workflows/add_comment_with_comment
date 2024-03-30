@@ -1,4 +1,6 @@
-name: excercise-ghapi
+name: add-label-with-comment
+# Tutorial on how to run things based on comment in PR:
+# https://dev.to/zirkelc/trigger-github-workflow-for-comment-on-pull-request-45l2
 on: issue_comment
 
 jobs:
@@ -11,10 +13,12 @@ jobs:
       REPO: ${{ github.repository }}
     if: (github.event.issue.pull_request != null) && startsWith(github.event.comment.body, '/')
     steps:
+    # The GitHub action for `issue_comment` is running on default (main or master) branch, so we need to check it out
     - name: Get PR branch
       uses: xt0rted/pull-request-comment-branch@v1
       id: comment-branch
 
+    # The workflow will not appear on the PR as it is on default branch, command below fixes that
     - name: Set latest commit status as pending
       uses: myrotvorets/set-commit-status-action@master
       with:
@@ -22,6 +26,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         status: pending
 
+    # Checking out PR branch
     - name: Checkout PR branch
       uses: actions/checkout@v3
       with:
