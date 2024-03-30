@@ -31,19 +31,6 @@ jobs:
       uses: actions/checkout@v3
       with:
         ref: ${{ steps.comment-branch.outputs.head_ref }}
-
-    - name: Setup Node.js 16
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16
-
-    - name: Set latest commit status as ${{ job.status }}
-      uses: myrotvorets/set-commit-status-action@master
-      if: always()
-      with:
-        sha: ${{ steps.comment-branch.outputs.head_sha }}
-        token: ${{ secrets.GITHUB_TOKEN }}
-        status: ${{ job.status }}
   
     - name: PR comment
       run: |
