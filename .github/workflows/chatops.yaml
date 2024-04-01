@@ -115,6 +115,7 @@ jobs:
       run: |
         ls
         pwd
+        ls src/
       
     - name: Run the report and make a comment
       shell: python
