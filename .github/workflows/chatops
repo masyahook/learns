@@ -1,10 +1,10 @@
-name: add-label-with-comment
+name: chatops
 # Tutorial on how to run things based on comment in PR:
 # https://dev.to/zirkelc/trigger-github-workflow-for-comment-on-pull-request-45l2
 on: issue_comment
 
 jobs:
-  pr_commented:
+  add-label:
     runs-on: ubuntu-latest
     env:
       NUMBER: ${{ github.event.issue.number }}
