@@ -44,6 +44,8 @@ def main(wandb_id: str):
     ]
     report.save()
 
+    return report.url
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compare the runs.")
@@ -53,3 +55,12 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     main(args.wandb_id)
+
+    # Add a comment to the pull request
+
+    gh = ghapi.GitHubAPI(token="YOUR_GITHUB_TOKEN")
+    pr_number = 123  # Replace with the actual pull request number
+    comment = "This is a test comment"
+    gh.create_pull_request_comment(
+        owner="OWNER", repo="REPO", pull_number=pr_number, body=comment
+    )
