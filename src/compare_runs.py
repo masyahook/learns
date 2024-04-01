@@ -8,23 +8,12 @@ from .config import WandBConfig
 ENTITY, PROJECT = WandBConfig.ENTITY, WandBConfig.PROJECT
 
 
-def main():
-
-    parser = argparse.ArgumentParser(description="Compare the runs.")
-    parser.add_argument(
-        "--wandb_id",
-        help="WandB ID to compare the runs, create a report for the run with this ID compared to the baseline run.",
-    )
-    args = parser.parse_args()
+def main(wandb_id: str):
 
     # Extract wandb runs
     api = wandb.Api()
-    queried_run = api.run(f"{ENTITY}/{PROJECT}/{args.wandb_id}")
+    queried_run = api.run(f"{ENTITY}/{PROJECT}/{wandb_id}")
     base_run = list(api.runs(f"{ENTITY}/{PROJECT}", filters={"tags": "baseline"}))[0]
-
-    # Extract the classification report from the queried run
-    queried_report = queried_run.summary["classification_report"]
-    base_report = base_run.summary["classification_report"]
 
     # Create a report comparing the two runs
     report = wr.Report(
@@ -57,4 +46,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Compare the runs.")
+    parser.add_argument(
+        "--wandb_id",
+        help="WandB ID to compare the runs, create a report for the run with this ID compared to the baseline run.",
+    )
+    args = parser.parse_args()
+    main(args.wandb_id)
