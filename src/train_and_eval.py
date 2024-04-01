@@ -1,7 +1,10 @@
 import argparse
 import logging
+import os
+import pickle
 
 import numpy as np
+import pandas as pd
 import wandb
 from sklearn.datasets import load_iris
 from sklearn.ensemble import RandomForestClassifier
@@ -14,6 +17,8 @@ from sklearn.tree import DecisionTreeClassifier
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+
+home = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def main():
@@ -50,6 +55,19 @@ def main():
         noise = np.random.normal(0, 0.5, X.shape)
         X += noise
 
+        # Log the input data and target
+        wandb.log(
+            {
+                "input_X": wandb.Table(
+                    dataframe=pd.DataFrame(data.data, columns=data.feature_names)
+                ),
+                "input_y": wandb.Table(
+                    dataframe=pd.DataFrame(data.target, columns=["target"])
+                ),
+                "noisy_X": wandb.Table(data=X, columns=data.feature_names),
+            }
+        )
+
         # Log information about the data and target
         logging.info("Data shape: %s", X.shape)
         logging.info("Target shape: %s", y.shape)
@@ -57,6 +75,20 @@ def main():
         # Split the data into training and testing sets
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42
+        )
+
+        # Log the train and test data
+        wandb.log(
+            {
+                "train_X": wandb.Table(data=X_train, columns=data.feature_names),
+                "train_y": wandb.Table(
+                    dataframe=pd.DataFrame(y_train, columns=["target"])
+                ),
+                "test_X": wandb.Table(data=X_test, columns=data.feature_names),
+                "test_y": wandb.Table(
+                    dataframe=pd.DataFrame(y_test, columns=["target"])
+                ),
+            }
         )
 
         # Log the size of the train and test sets
@@ -77,6 +109,13 @@ def main():
 
         model.fit(X_train, y_train)
 
+        # Save the trained model using pickle
+        model_path = f"{home}/models/trained_{model_type}.pkl"
+        with open(model_path, "wb") as f:
+            pickle.dump(model, f)
+
+        wandb.log_model(name=model_type, path=model_path)
+
         # Log that the model has been trained
         logging.info("Model trained")
 
@@ -87,10 +126,12 @@ def main():
         logging.info("Model tested")
 
         # Calculate the classification report
-        report = classification_report(y_test, y_pred, output_dict=True)
+        report = pd.DataFrame(
+            classification_report(y_test, y_pred, output_dict=True)
+        ).transpose()
         report_str = classification_report(y_test, y_pred)
 
-        run.log({"classification_report": report})
+        run.log({"classification_report": wandb.Table(dataframe=report)})
 
         # Log the classification report using logging
         logging.info("Classification Report:\n%s", report_str)
