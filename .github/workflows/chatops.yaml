@@ -121,7 +121,10 @@ jobs:
       shell: python
       run: |
         import os
+        import sys
         from ghapi.core import GhApi
+        print(os.getcwd())
+        print(sys.path)
         from src.compare_runs import main
         owner, repo = os.environ['REPO'].split('/')
         api = GhApi(owner=owner, repo=repo)
