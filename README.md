@@ -6,7 +6,7 @@ This repo contains my personal learnings around various topics in Machine Learni
 
 ### [CI/CD for Machine Learning](https://www.wandb.courses/courses/ci-cd-for-machine-learning)
 
-As part of CI/CD for Machine Learning course by Weights and Biases, we implemented a few modules and workflows. The corresponding Weights and Biases project can be found [here](https://wandb.ai/masyahook/ci-cd-for-ml-gitops-course). Please checkout [`hw/wandb-run-base-comparison`](https://github.com/masyahook/learns/tree/hw/wandb-run-base-comparison) branch.
+As part of CI/CD for Machine Learning course by Weights and Biases, we implemented a few modules and workflows. The corresponding Weights and Biases project can be found [here](https://wandb.ai/masyahook/ci-cd-for-ml-gitops-course). Please checkout [`hw/wandb-run-base-comparison`](https://github.com/masyahook/learns/tree/hw/wandb-run-base-comparison) branch, and explore the corresponding [PR](https://github.com/masyahook/learns/pull/3).
 
 - `src/train_and_eval.py` - a dummy pipeline that trains and evaluates a machine learning model. Everything is logged in Weights and Biases (you can find the project [here](https://wandb.ai/masyahook/ci-cd-for-ml-gitops-course)). To run the pipeline, you can use the following command:
 
