@@ -60,7 +60,7 @@ jobs:
         from ghapi.core import GhApi
         owner, repo = os.environ['REPO'].split('/')
         api = GhApi(owner=owner, repo=repo)
-        label = os.environ['COMMENT'].strip('/')
+        label = os.environ['COMMENT'].split(' ')[1]
         api.issues.add_labels(issue_number=os.environ['NUMBER'], labels=[label])
 
   compare-runs:
