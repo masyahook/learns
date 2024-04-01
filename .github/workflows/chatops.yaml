@@ -109,7 +109,12 @@ jobs:
     - name: see payload # this step is for debugging purposes only, so you can see the payload. 
       run: echo "PAYLOAD:\n${PAYLOAD}\n"
       env:
-        PAYLOAD: ${{ toJSON(github.event) }}       
+        PAYLOAD: ${{ toJSON(github.event) }}
+    
+    - name: check the location
+      run: |
+        ls
+        pwd
       
     - name: Run the report and make a comment
       shell: python
