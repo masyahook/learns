@@ -13,6 +13,10 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
+from .config import WandBConfig
+
+ENTITY, PROJECT = WandBConfig.ENTITY, WandBConfig.PROJECT
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -41,7 +45,8 @@ def main():
 
     # Log the classification report to Weights and Biases
     with wandb.init(
-        project="ci-cd-for-ml-gitops-course",
+        entity=ENTITY,
+        project=PROJECT,
         tags=args.tags,
         config=args,
         job_type=model_type,
