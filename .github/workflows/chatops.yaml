@@ -62,4 +62,64 @@ jobs:
         api = GhApi(owner=owner, repo=repo)
         label = os.environ['COMMENT'].strip('/')
         api.issues.add_labels(issue_number=os.environ['NUMBER'], labels=[label])
+
+  compare-runs:
+    runs-on: ubuntu-latest
+    env:
+      NUMBER: ${{ github.event.issue.number }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      COMMENT: ${{ github.event.comment.body }} 
+      REPO: ${{ github.repository }}
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+    if: (github.event.issue.pull_request != null) && startsWith(github.event.comment.body, '/wandb')
+    steps:
+    
+    # The GitHub action for `issue_comment` is running on default (main or master) branch, so we need to check it out
+    - name: Get PR branch
+      uses: xt0rted/pull-request-comment-branch@v1
+      id: comment-branch
+
+    # The workflow will not appear on the PR as it is on default branch, command below fixes that
+    - name: Set latest commit status as pending
+      uses: myrotvorets/set-commit-status-action@master
+      with:
+        sha: ${{ steps.comment-branch.outputs.head_sha }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: pending
+
+    # Checking out PR branch
+    - name: Checkout PR branch
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ steps.comment-branch.outputs.head_ref }}
+
+    - name: Set latest commit status as ${{ job.status }}
+      uses: myrotvorets/set-commit-status-action@master
+      if: always()
+      with:
+        sha: ${{ steps.comment-branch.outputs.head_sha }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: ${{ job.status }}
+  
+    - name: install dependencies
+      run: |
+        pip install ghapi
+        pip install wandb
+
+    - name: see payload # this step is for debugging purposes only, so you can see the payload. 
+      run: echo "PAYLOAD:\n${PAYLOAD}\n"
+      env:
+        PAYLOAD: ${{ toJSON(github.event) }}       
+      
+    - name: Run the report and make a comment
+      shell: python
+      run: |
+        import os
+        from ghapi.core import GhApi
+        from src.compare_runs import main
+        owner, repo = os.environ['REPO'].split('/')
+        api = GhApi(owner=owner, repo=repo)
+        wandb_id = os.environ['COMMENT'].strip('\wandb ')
+        main(wandb_id)
+        
         
