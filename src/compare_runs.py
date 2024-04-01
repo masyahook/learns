@@ -1,9 +1,15 @@
 import argparse
+import logging
 
 import wandb
 import wandb.apis.reports as wr
 
 from .config import WandBConfig
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 ENTITY, PROJECT = WandBConfig.ENTITY, WandBConfig.PROJECT
 
@@ -14,6 +20,10 @@ def main(wandb_id: str):
     api = wandb.Api()
     queried_run = api.run(f"{ENTITY}/{PROJECT}/{wandb_id}")
     base_run = list(api.runs(f"{ENTITY}/{PROJECT}", filters={"tags": "baseline"}))[0]
+
+    logging.info("Comparing the runs.")
+    logging.info(f"Queried run: {queried_run.name}")
+    logging.info(f"Baseline run: {base_run.name}\n")
 
     # Create a report comparing the two runs
     report = wr.Report(
@@ -43,6 +53,8 @@ def main(wandb_id: str):
         ),
     ]
     report.save()
+
+    logging.info(f"Report created at {report.url}!")
 
     return report.url
 

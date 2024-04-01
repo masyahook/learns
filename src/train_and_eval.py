@@ -9,7 +9,7 @@ import wandb
 from sklearn.datasets import load_iris
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -140,6 +140,13 @@ def main():
 
         # Log the classification report using logging
         logging.info("Classification Report:\n%s", report_str)
+
+        # Get the precision and recall for each class
+        precision = precision_score(y_test, y_pred, average="macro")
+        recall = recall_score(y_test, y_pred, average="macro")
+
+        # Log the precision and recall for each class
+        wandb.log({"precision": precision, "recall": recall})
 
 
 if __name__ == "__main__":
