@@ -11,7 +11,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       COMMENT: ${{ github.event.comment.body }} 
       REPO: ${{ github.repository }}
-    if: (github.event.issue.pull_request != null) && startsWith(github.event.comment.body, '/')
+    if: (github.event.issue.pull_request != null) && startsWith(github.event.comment.body, '/label')
     steps:
     
     # The GitHub action for `issue_comment` is running on default (main or master) branch, so we need to check it out
