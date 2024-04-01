@@ -127,7 +127,7 @@ jobs:
         from src.compare_runs import main
         owner, repo = os.environ['REPO'].split('/')
         api = GhApi(owner=owner, repo=repo)
-        wandb_id = os.environ['COMMENT'].strip('\wandb ')
+        wandb_id = os.environ['COMMENT'].split(' ')[1]
         main(wandb_id)
         
         
